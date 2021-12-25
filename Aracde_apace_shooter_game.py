@@ -2,7 +2,7 @@ import pygame
 import os
 from pygame import rect
 from pygame.constants import USEREVENT
-
+pygame.font.init()
 from pygame.key import key_code
 
 White = (255,255,255)
@@ -14,6 +14,7 @@ Border_display = pygame.Rect(WIDTH//2-5,0,10,HEIGHT)
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Arcade-space-shooter-2D')
 
+HEALTH_FONT = pygame.font.SysFont('comicsans',40)
 FPS= 60
 vel = 5
 BULLET_VEL = 7
@@ -27,11 +28,21 @@ yellow_resized= pygame.transform.rotate(pygame.transform.scale(Yellow_spaceship_
 red_spaceship_image = pygame.image.load(os.path.join('Assets','spaceship_red.png'))
 red_resized = pygame.transform.rotate(pygame.transform.scale(red_spaceship_image,(s_width,s_height)),270)
 
-def draw(red,yellow,red_bullets,yellow_bullets):
-    WIN.fill(White)
+SPACE = pygame.transform.scale( pygame.image.load(os.path.join('Assets','space.png')), (WIDTH,HEIGHT))
+
+def draw(red,yellow,red_bullets,yellow_bullets,red_heath,yellow_heath):
+    WIN.blit(SPACE,(0,0))
     pygame.draw.rect(WIN,(0,0,0),Border_display)
+    
+    red_heath_text = HEALTH_FONT.render("Heath: "+str(red_heath),1, White)
+    yellow_heath_text = HEALTH_FONT.render("Heath: "+str(yellow_heath),1, White)
+    WIN.blit(red_heath_text,(WIDTH-red_heath_text.get_width()-10,10))
+    WIN.blit(yellow_heath_text,(10,10))
+    
     WIN.blit(yellow_resized,(yellow.x,yellow.y))
     WIN.blit(red_resized,(red.x,red.y))
+    
+    
     
     for bullet in red_bullets:
         pygame.draw.rect(WIN, RED,bullet)
@@ -87,6 +98,9 @@ def main():
     red_bullets = []
     yellow_bullet = []
     
+    red_heath =10
+    yellow_heath = 10
+    
     clock = pygame.time.Clock()
     run = True
     while run:
@@ -104,6 +118,23 @@ def main():
                 if event.key == pygame.K_RCTRL and len(red_bullets)< MAX_BULLETS:
                     bullet = pygame.Rect(red.x,red.y+red.height//2-2,10,5)
                     red_bullets.append(bullet)
+                    
+                if event.type == RED_HIT:
+                    red_heath -=1
+                    
+                if event.type == YELLOW_HIT:
+                    yellow_heath -= 1
+        
+        winner_text = ''
+                    
+        if red_heath <= 0 :
+            winner_text = 'Yellow Wins!'
+        if yellow_heath <= 0:
+            winner_text = 'Red WIns!'
+        if winner_text != '':
+            pass
+        
+            
         print(red_bullets,yellow_bullet)            
         keys_pressed = pygame.key.get_pressed()
         yellow_handles(keys_pressed,yellow)
@@ -111,7 +142,7 @@ def main():
         
         handle_bullets(yellow_bullet,red_bullets,yellow,red)
         
-        draw(red,yellow,red_bullets,yellow_bullet)
+        draw(red,yellow,red_bullets,yellow_bullet,red_heath,yellow_heath)
         
         
     pygame.quit()
