@@ -1,9 +1,11 @@
 import pygame
 import os
-from pygame import rect
+from pygame import init, rect
 from pygame.constants import USEREVENT
 pygame.font.init()
 from pygame.key import key_code
+pygame.mixer.init()
+pygame.init()
 
 White = (255,255,255)
 RED = (255,0,0)
@@ -17,6 +19,8 @@ pygame.display.set_caption('Arcade-space-shooter-2D')
 HEALTH_FONT = pygame.font.SysFont('comicsans',40)
 WINNER_FONT = pygame.font.SysFont('comicsans', 100)
 
+BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join('Assets', 'Grenade+1.mp3'))
+BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join('Assets', 'Gun+Silencer.mp3'))
 FPS= 60
 vel = 5
 BULLET_VEL = 7
@@ -124,16 +128,20 @@ def main():
                 if event.key == pygame.K_LCTRL and len(yellow_bullet)<MAX_BULLETS:
                     bullet = pygame.Rect(yellow.x+yellow.width,yellow.y+yellow.height//2-2,10,5)
                     yellow_bullet.append(bullet)
+                    BULLET_FIRE_SOUND.play()
                     
                 if event.key == pygame.K_RCTRL and len(red_bullets)< MAX_BULLETS:
                     bullet = pygame.Rect(red.x,red.y+red.height//2-2,10,5)
                     red_bullets.append(bullet)
+                    BULLET_FIRE_SOUND.play()
                     
             if event.type == RED_HIT:
                 red_heath -= 1
+                BULLET_HIT_SOUND.play()
                     
             if event.type == YELLOW_HIT:
                 yellow_heath -= 1
+                BULLET_HIT_SOUND.play()
         
         
         winner_text = ''
@@ -158,6 +166,9 @@ def main():
         
         
     main()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
                 
 if __name__ == '__main__':
     main()
