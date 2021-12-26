@@ -15,6 +15,8 @@ WIN = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Arcade-space-shooter-2D')
 
 HEALTH_FONT = pygame.font.SysFont('comicsans',40)
+WINNER_FONT = pygame.font.SysFont('comicsans', 100)
+
 FPS= 60
 vel = 5
 BULLET_VEL = 7
@@ -38,7 +40,7 @@ def draw(red,yellow,red_bullets,yellow_bullets,red_heath,yellow_heath):
     yellow_heath_text = HEALTH_FONT.render("Heath: "+str(yellow_heath),1, White)
     WIN.blit(red_heath_text,(WIDTH-red_heath_text.get_width()-10,10))
     WIN.blit(yellow_heath_text,(10,10))
-    
+     
     WIN.blit(yellow_resized,(yellow.x,yellow.y))
     WIN.blit(red_resized,(red.x,red.y))
     
@@ -90,6 +92,13 @@ def handle_bullets(yellow_bullets,red_bullets,yellow,red):
         elif bullet.x < 0:
             red_bullets.remove(bullet)
             
+def draw_winner(text):
+    draw_text = WINNER_FONT.render(text,1,White)
+    WIN.blit(draw_text,(WIDTH/2- draw_text.get_width()/2
+             ,HEIGHT/2 - draw_text.get_height()/2))
+    
+    pygame.display.update()
+    pygame.time.delay(5000)
 
 def main():
     red = pygame.Rect(900,300,s_width,s_height)
@@ -98,7 +107,7 @@ def main():
     red_bullets = []
     yellow_bullet = []
     
-    red_heath =10
+    red_heath = 10
     yellow_heath = 10
     
     clock = pygame.time.Clock()
@@ -108,6 +117,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
                 
             if event.type == pygame.KEYDOWN:
                 
@@ -119,11 +129,12 @@ def main():
                     bullet = pygame.Rect(red.x,red.y+red.height//2-2,10,5)
                     red_bullets.append(bullet)
                     
-                if event.type == RED_HIT:
-                    red_heath -=1
+            if event.type == RED_HIT:
+                red_heath -= 1
                     
-                if event.type == YELLOW_HIT:
-                    yellow_heath -= 1
+            if event.type == YELLOW_HIT:
+                yellow_heath -= 1
+        
         
         winner_text = ''
                     
@@ -132,7 +143,8 @@ def main():
         if yellow_heath <= 0:
             winner_text = 'Red WIns!'
         if winner_text != '':
-            pass
+            draw_winner(winner_text)
+            break
         
             
         print(red_bullets,yellow_bullet)            
@@ -145,7 +157,7 @@ def main():
         draw(red,yellow,red_bullets,yellow_bullet,red_heath,yellow_heath)
         
         
-    pygame.quit()
+    main()
                 
 if __name__ == '__main__':
     main()
